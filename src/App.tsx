@@ -64,8 +64,8 @@ const App: FC = () => {
   return (
     <Container
       style={{
-        paddingTop: '1rem',
-        paddingBottom: '1rem'
+        marginTop: '3rem',
+        marginBottom: '3rem'
       }}
     >
       <Root>
@@ -106,7 +106,7 @@ const App: FC = () => {
             .sort(([ak], [bk]) => {
               const aValue = parseInt(ak.split('-')[1])
               const bValue = parseInt(bk.split('-')[1])
-              return bValue - aValue
+              return aValue - bValue
             })
             .map(([pkey, p]) => {
               const { success, fail, name, onenote_url } = p
