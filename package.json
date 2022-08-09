@@ -5,6 +5,7 @@
   "scripts": {
     "format": "prettier --write src",
     "lint": "eslint --ext .ts,.tsx src",
+    "lint:fix": "eslint --ext .ts,.tsx --fix src",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "analyze": "cross-env ANALYZE=true yarn build",
