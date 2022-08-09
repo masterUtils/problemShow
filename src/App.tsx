@@ -62,7 +62,12 @@ const App: FC = () => {
   }
 
   return (
-    <Container>
+    <Container
+      style={{
+        paddingTop: '1rem',
+        paddingBottom: '1rem'
+      }}
+    >
       <Root>
         <CssBaseline />
         <Dialog
@@ -98,7 +103,11 @@ const App: FC = () => {
         </Dialog>
         <Grid container spacing={2}>
           {Object.entries(problem)
-            .sort()
+            .sort(([ak], [bk]) => {
+              const aValue = parseInt(ak.split('-')[1])
+              const bValue = parseInt(bk.split('-')[1])
+              return bValue - aValue
+            })
             .map(([pkey, p]) => {
               const { success, fail, name, onenote_url } = p
               return (

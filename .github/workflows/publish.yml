@@ -33,7 +33,6 @@ jobs:
       - name: Build
         run: |
           yarn install
-          yarn lint
           yarn build
 
       - name: Setup Pages
