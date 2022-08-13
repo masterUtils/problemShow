@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useEffect, useState } from 'react'
+import { ChangeEvent, FC, useEffect, useState } from "react";
 import {
   Button,
   Container,
@@ -10,11 +10,12 @@ import {
   DialogTitle,
   Grid,
   styled,
-  TextField
-} from '@mui/material'
-import { endpoint } from '@/main'
-import { useKey, useLocalStorage } from 'react-use'
-import { Problem } from './Problem'
+  TextField,
+  Typography
+} from "@mui/material";
+import { endpoint } from "@/main";
+import { useBoolean, useKey } from "react-use";
+import { Problem } from "./Problem";
 
 export type ProblemType = {
   success: number
@@ -27,45 +28,83 @@ type ProblemResponse = {
 }
 
 const App: FC = () => {
-  const [problem, setProblem] = useState<ProblemResponse>({})
-  const [section, setSection] = useLocalStorage('section', '')
+  const [problem, setProblem] = useState<ProblemResponse>({});
+  const [section, setSection] = useState<string | null>(null);
+  const [loading, setLoading] = useBoolean(false);
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useBoolean(false);
+
+  let inputBuffer = "";
 
   useKey(
     ev => {
-      if (ev.ctrlKey && ev.key.toLowerCase() === 'k') {
-        ev.preventDefault()
-        return true
+      if (ev.ctrlKey && ev.key.toLowerCase() === "k") {
+        ev.preventDefault();
+        return true;
       }
-      return false
+      return false;
     },
     () => {
-      setOpen(true)
+      setOpen(true);
     }
-  )
+  );
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    console.log(params.toString());
+    const spSection = params.get("s");
+
+    if (spSection) {
+      setSection(spSection);
+    } else {
+      setSection("");
+    }
+  }, []);
 
   useEffect(() => {
     if (section && !open) {
+      setLoading(true);
+      setProblem({});
       fetch(`${endpoint}/stats/_/${section}.json`)
         .then(res => res.json())
         .then(setProblem)
+        .catch((e) => {
+          console.warn(e);
+          console.warn("Failed to fetch problem");
+        }).finally(
+        () => {
+          setLoading(false);
+        }
+      );
     }
-  }, [section, open])
+  }, [section, open, setLoading]);
+
+  useEffect(() => {
+    if (section !== null) {
+      const url = new URL(window.location.href);
+      if (section !== "") {
+        url.searchParams.set("s", section);
+      }
+      window.history.pushState({}, "", url.toString());
+    }
+  }, [section]);
 
   function handleDialogClose() {
-    setOpen(false)
+    setSection(inputBuffer);
+    setOpen(false);
   }
 
   function dialogOnChange(ev: ChangeEvent<HTMLInputElement>) {
-    setSection(ev.target.value)
+    inputBuffer = ev.target.value;
   }
+
+  const showTips = Object.keys(problem).length === 0 && !loading;
 
   return (
     <Container
       style={{
-        marginTop: '3rem',
-        marginBottom: '3rem'
+        marginTop: "3rem",
+        marginBottom: "3rem"
       }}
     >
       <Root>
@@ -73,9 +112,9 @@ const App: FC = () => {
         <Dialog
           open={open}
           onClose={handleDialogClose}
-          maxWidth={'md'}
+          maxWidth={"md"}
           style={{
-            minWidth: '500px'
+            minWidth: "500px"
           }}
         >
           <DialogTitle>Section Prefix</DialogTitle>
@@ -83,17 +122,17 @@ const App: FC = () => {
             <DialogContentText>Set Section ID</DialogContentText>
             <TextField
               autoFocus
-              margin='dense'
-              label='Section id'
-              type='text'
+              margin="dense"
+              label="Section id"
+              type="text"
               onChange={dialogOnChange}
-              variant='standard'
+              variant="standard"
             />
           </DialogContent>
           <DialogActions>
             <Button
               onClick={() => {
-                setOpen(false)
+                setOpen(false);
               }}
             >
               Cancel
@@ -101,26 +140,45 @@ const App: FC = () => {
             <Button onClick={handleDialogClose}>Save</Button>
           </DialogActions>
         </Dialog>
-        <Grid container spacing={2}>
+        {(!showTips) && (<Grid container spacing={2}>
           {Object.entries(problem)
             .sort(([ak], [bk]) => {
-              const aValue = parseInt(ak.split('-')[1])
-              const bValue = parseInt(bk.split('-')[1])
-              return aValue - bValue
+              const aValue = parseInt(ak.split("-")[1]);
+              const bValue = parseInt(bk.split("-")[1]);
+              return aValue - bValue;
             })
             .map(([pkey, p]) => {
-              const { success, fail, name, onenote_url } = p
+              const { success, fail, name, onenote_url } = p;
               return (
                 <Problem key={pkey} pkey={pkey} success={success} fail={fail} name={name} onenote_url={onenote_url} />
-              )
+              );
             })}
-        </Grid>
+        </Grid>)}
+        {showTips && (
+          <div style={{
+            textAlign: "center"
+          }}>
+            {section && (
+              <Typography variant={"h3"}>
+                {section} has no valid data.
+              </Typography>
+            )}
+            {!section && (
+              <Typography variant={"h3"}>
+                No section id set.
+              </Typography>
+            )}
+            <Typography variant={"h3"}>
+              Click Ctrl+K to open the setting dialog.
+            </Typography>
+          </div>
+        )}
       </Root>
     </Container>
-  )
-}
+  );
+};
 
-const Root = styled('div')`
+const Root = styled("div")`
   width: 100%;
   min-height: 95vh;
   display: flex;
@@ -131,6 +189,6 @@ const Root = styled('div')`
     text-decoration: none;
     color: ${({ theme: { palette } }) => palette.primary.main};
   }
-`
+`;
 
-export default App
+export default App;

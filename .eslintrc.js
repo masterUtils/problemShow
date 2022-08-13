@@ -1,6 +1,6 @@
 module.exports = {
-  extends: ['react-app'],
+  extends: ["react-app"],
   rules: {
-    '@typescript-eslint/no-explicit-any': 2
+    "@typescript-eslint/no-explicit-any": 2
   }
-}
+};
