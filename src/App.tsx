@@ -50,9 +50,7 @@ const App: FC = () => {
   );
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    console.log(params.toString());
-    const spSection = params.get("s");
+    const spSection = new URLSearchParams(window.location.search).get("s");
 
     if (spSection) {
       setSection(spSection);
