@@ -99,12 +99,7 @@ const App: FC = () => {
   const showTips = Object.keys(problem).length === 0 && !loading;
 
   return (
-    <Container
-      style={{
-        marginTop: "3rem",
-        marginBottom: "3rem"
-      }}
-    >
+    <Container>
       <Root>
         <CssBaseline />
         <Dialog
@@ -138,7 +133,13 @@ const App: FC = () => {
             <Button onClick={handleDialogClose}>Save</Button>
           </DialogActions>
         </Dialog>
-        {(!showTips) && (<Grid container spacing={2}>
+        {(!showTips) && (<Grid
+          container
+          spacing={2}
+          style={{
+            marginTop: "3rem",
+            marginBottom: "3rem"
+          }}>
           {Object.entries(problem)
             .sort(([ak], [bk]) => {
               const aValue = parseInt(ak.split("-")[1]);

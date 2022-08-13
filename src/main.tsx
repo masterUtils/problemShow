@@ -16,4 +16,4 @@ root.render(
 );
 
 export const endpoint =
-  process.env.NODE_ENV === "development" ? "http://localhost:8000" : "https://problemmanager.learningman.top";
+  process.env.NODE_ENV !== "development" ? "http://localhost:8000" : "https://problemmanager.learningman.top";
